@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BZU-CS — Student Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p:#d63384;
+  --ps:#fde2f3;
+  --s:#c2185b;
+  --w:#ff4da6;
+
+  --d:#2b1023;
+  --m:#8b5d7a;
+
+  --b:#f3c4dd;
+  --bg:#fff7fb;
+  --wh:#ffffff;
+
+  --r:10px;
+
+  --sh:0 1px 3px rgba(214,51,132,.12),
+       0 1px 2px rgba(214,51,132,.08);
+}
+body.dark{
+  --p:#ff4da6;
+  --ps:#3b1b2f;
+  --s:#ff7bc3;
+  --w:#ff94c9;
+
+  --d:#fdf2f8;
+  --m:#d1a3bc;
+
+  --b:#44263a;
+  --bg:#140811;
+  --wh:#1f0d19;
+
+  --sh:0 2px 10px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--d);font-size:14px}
+body,
+.card,
+.tbox,
+.fbox,
+.tb,
+.fc,
+.overlay,
+.mbox,
+#topbar,
+.cc,
+table,
+td,
+th{
+  transition:
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease;
+}
+#sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--d);display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+#main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
+#topbar{height:56px;background:var(--wh);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:50}
+#content{padding:24px;flex:1}
+.brand{padding:18px 16px;font-size:1rem;font-weight:700;color:#fff;letter-spacing:-.3px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand span{color:#ff7bc3}
+.nav-s{padding:10px 10px 4px;font-size:.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.nav-a{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;cursor:pointer;color:rgba(255,255,255,.55);font-size:.84rem;font-weight:500;margin:1px 8px;transition:.15s}
+.nav-a:hover{color:#fff;background:rgba(255,255,255,.07)}
+.nav-a.on{
+  color:#fff;
+  background:linear-gradient(135deg,#d63384,#ff4da6);
+}
+.nav-a i{width:16px;text-align:center;font-size:.85rem}
+.page{display:none;animation:fi .25s ease}
+.page.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.pt{font-size:1.3rem;font-weight:700;letter-spacing:-.4px}
+.ps{font-size:.8rem;color:var(--m);margin-top:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.card{background:var(--wh);border-radius:var(--r);padding:18px;box-shadow:var(--sh);border:1px solid var(--b)}
+.card .val{font-size:1.8rem;font-weight:700;font-family:'DM Mono',monospace;color:var(--d)}
+.card .lbl{font-size:.75rem;color:var(--m);margin-top:2px}
+.card.blue .val{color:#d63384}
+.card.green .val{color:#c2185b}
+.card.red .val{color:#ff4d8d}
+.tbox{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--b);overflow:hidden}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{background:var(--bg);padding:10px 14px;font-size:.72rem;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.6px;text-align:left;border-bottom:1px solid var(--b);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--b);font-size:.84rem;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.fbox{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--b);padding:22px}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:.78rem;font-weight:600;color:#374151;margin-bottom:4px}
+.fc{width:100%;padding:8px 12px;border:1px solid var(--b);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--d);background:var(--wh);outline:none;transition:.15s}
+.fc:focus{
+  border-color:#d63384;
+  box-shadow:0 0 0 3px rgba(214,51,132,.15);
+}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sec-lbl{font-size:.72rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--m);margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--b)}
+.sec-lbl:first-child{margin-top:0}
+.btn{padding:8px 16px;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.btn-p{
+  background:linear-gradient(135deg,#d63384,#ff4da6);
+  color:#fff;
+}
+.btn-p:hover{
+  background:linear-gradient(135deg,#c2185b,#e91e63);
+}
+
+.btn-s{
+  background:linear-gradient(135deg,#c2185b,#e91e63);
+  color:#fff;
+}
+.btn-s:hover{
+  background:linear-gradient(135deg,#ad1457,#d81b60);
+}
+.btn-r{background:#fee2e2;color:#e02424;border:1px solid #fca5a5}.btn-r:hover{background:#fca5a5}
+.btn-l{background:var(--bg);color:var(--d);border:1px solid var(--b)}.btn-l:hover{background:var(--b)}
+.btn-xs{padding:5px 10px;font-size:.75rem;border-radius:6px}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.7rem;font-weight:600}
+.b-g{background:#def7ec;color:#03543f}.b-r{background:#fde8e8;color:#9b1c1c}
+.b-y{background:#fdf6b2;color:#723b13}.b-b{background:var(--ps);color:var(--p)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.overlay.on{display:flex}
+.mbox{background:var(--wh);border-radius:14px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:fi .2s ease}
+.mbox.sm{max-width:400px}
+.mh{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.95rem;position:sticky;top:0;background:var(--wh)}
+.mb{padding:20px}
+.mf{padding:14px 20px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end}
+.xbtn{background:none;border:none;cursor:pointer;color:var(--m);font-size:1.1rem;padding:2px 6px;border-radius:5px}.xbtn:hover{background:var(--b);color:var(--d)}
+.tb{background:var(--wh);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;box-shadow:var(--sh)}
+.si{display:flex;align-items:center;gap:7px;background:var(--bg);border-radius:7px;padding:7px 12px;flex:1;min-width:160px}
+.si input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.84rem;width:100%;color:var(--d)}
+.si i{color:var(--m);font-size:.8rem}
+#toast{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.ti{background:var(--d);color:#fff;padding:11px 16px;border-radius:9px;font-size:.82rem;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:fi .25s ease;border-left:3px solid var(--s)}
+.ti.err{border-left-color:#e02424}
+.bc{font-size:.82rem;color:var(--m)}.bc b{color:var(--d)}
+.pbar{background:var(--b);border-radius:99px;height:6px;overflow:hidden;width:80px;display:inline-block}
+.pfill{height:100%;border-radius:99px;background:var(--p)}
+.empty{text-align:center;padding:36px 20px;color:var(--m)}
+.empty i{font-size:2.2rem;margin-bottom:10px;display:block;opacity:.3}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:4px}
+.cc{background:var(--wh);border:1px solid var(--b);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;transition:.15s}
+.cc:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.cc-top{height:6px}
+.cc-body{padding:16px}
+.cc-name{font-weight:700;font-size:.95rem;margin-bottom:10px}
+.cc-row{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--m);margin-bottom:5px}
+.cc-row i{width:13px;font-size:.78rem}
+.cc-foot{padding:10px 16px;border-top:1px solid var(--b);display:flex;gap:6px}
+.b-o{background:#fff3e0;color:#e65100}
+.b-p{background:#f3e8ff;color:#6b21a8}
+@media(max-width:600px){#sidebar{transform:translateX(-100%);transition:.2s}#sidebar.open{transform:none}#main{margin-left:0}#hbtn{display:flex!important}.fr{grid-template-columns:1fr}}
+#hbtn{display:none;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--d)}
+body.compact-tables td{padding:6px 14px!important}
+/* KEEP SIDEBAR SAME IN BOTH MODES */
+body.dark #sidebar{
+    background: #111928 !important;
+}
+
+body.dark .brand{
+    color: #ffffff !important;
+}
+
+body.dark .brand span{
+    color: #ff7ac6 !important;
+}
+
+body.dark .nav-s{
+    color: rgba(255,255,255,0.35) !important;
+}
+
+body.dark .nav-a{
+    color: rgba(255,255,255,0.75) !important;
+}
+
+body.dark .nav-a:hover{
+    background: rgba(255,255,255,0.08) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .nav-a.on{
+    background: #ff4fa3 !important;
+    color: #ffffff !important;
+}
+.toggle-sw{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--b);border-radius:99px;cursor:pointer;transition:.2s}
+.toggle-track::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+.toggle-sw input:checked+.toggle-track{background:var(--p)}
+.toggle-sw input:checked+.toggle-track::after{transform:translateX(18px)}
+#loader {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #43012b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loader-box p {
+  color: white;
+  font-size: 32px;
+  font-family: Arial, sans-serif;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+  <div id="loader">
+  <div class="loader-box">
+    <p>Welcome to BZU Computer Science Department!</p>
+  </div>
+</div>
+<div id="toast"></div>
+
+<aside id="sidebar">
+  <div class="brand">BZU<span>CS</span></div>
+  <div class="nav-s">Main</div>
+  <div class="nav-a on" onclick="go('dashboard')"><i class="fa fa-gauge"></i>Dashboard</div>
+  <div class="nav-a" onclick="go('students')"><i class="fa fa-users"></i>Students</div>
+  <div class="nav-a" onclick="go('add')"><i class="fa fa-user-plus"></i>Add Student</div>
+  <div class="nav-s">Academic</div>
+  <div class="nav-a" onclick="go('results')"><i class="fa fa-chart-bar"></i>Results</div>
+  <div class="nav-a" onclick="go('attendance')"><i class="fa fa-calendar-check"></i>Attendance</div>
+  <div class="nav-a" onclick="go('courses')"><i class="fa fa-book-open"></i>Courses</div>
+  <div class="nav-a" onclick="go('exams')"><i class="fa fa-file-alt"></i>Examinations</div>
+  <div class="nav-a" onclick="go('reports')"><i class="fa fa-chart-pie"></i>Reports</div>
+  <div class="nav-s">System</div>
+  <div class="nav-a" onclick="go('settings')"><i class="fa fa-gear"></i>Settings</div>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <button id="hbtn" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fa fa-bars"></i></button>
+    <div class="bc">
+  BZU-CS / <b id="bc-cur">Dashboard</b>
+</div>
+
+<button class="btn btn-l" onclick="toggleTheme()" id="themeBtn">
+  <i class="fa fa-moon"></i>
+  Dark Mode
+</button>
+  </div>
+  <div id="content">
+
+    <!-- DASHBOARD -->
+    <div id="p-dashboard" class="page on">
+      <div class="ph">
+        <div><div class="pt">Dashboard</div><div class="ps">System overview</div></div>
+        <button class="btn btn-p" onclick="go('add')"><i class="fa fa-plus"></i>Add Student</button>
+      </div>
+      <div class="cards">
+        <div class="card blue"><div class="val" id="d-total">0</div><div class="lbl">Total Students</div></div>
+        <div class="card green"><div class="val" id="d-active">0</div><div class="lbl">Active</div></div>
+        <div class="card red"><div class="val" id="d-inactive">0</div><div class="lbl">Inactive</div></div>
+        <div class="card"><div class="val" id="d-avggpa">—</div><div class="lbl">Avg GPA</div></div>
+      </div>
+      <div class="tbox">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--b);font-weight:600;font-size:.9rem">Recent Students</div>
+        <div class="tw"><table><thead><tr><th>Name</th><th>ID</th><th>Semester</th><th>Status</th></tr></thead>
+        <tbody id="d-recent"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="p-students" class="page">
+      <div class="ph">
+        <div><div class="pt">Students</div><div class="ps">Manage all records</div></div>
+        <button class="btn btn-p" onclick="go('add')"><i class="fa fa-plus"></i>Add Student</button>
+        <button class="btn btn-s" onclick="downloadStudentsExcel()">
+  <i class="fa fa-file-excel"></i>Download Student Details
+</button>
+      </div>
+      <div class="tb">
+        <div class="si"><i class="fa fa-search"></i><input id="s-q" placeholder="Search name / ID / email…" oninput="renderStudents()"></div>
+        <select class="fc" style="width:120px" id="s-gr" onchange="renderStudents()">
+          <option value="">All Semesters</option>
+          <option>1st Semester</option>
+          <option>2nd Semester</option>
+          <option>3rd Semester</option>
+          <option>4th Semester</option>
+          <option>5th Semester</option>
+          <option>6th Semester</option>
+          <option>7th Semester</option>
+          <option>8th Semester</option>
+        </select>
+        <select class="fc" style="width:120px" id="s-st" onchange="renderStudents()">
+          <option value="">All Status</option><option>Active</option><option>Inactive</option>
+        </select>
+      </div>
+      <div class="tbox">
+        <div class="tw"><table>
+          <thead><tr><th>Name</th><th>ID</th><th>Email</th><th>Semester</th><th>GPA</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="s-body"></tbody>
+        </table></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px">
+        <span id="s-info" style="font-size:.78rem;color:var(--m)"></span>
+        <div id="s-pages" style="display:flex;gap:4px"></div>
+      </div>
+    </div>
+
+    <!-- ADD STUDENT -->
+    <div id="p-add" class="page">
+      <div class="ph"><div><div class="pt">Add New Student</div><div class="ps">Fill in details below
+        </div></div></div>
+      <div class="fbox">
+        <div class="sec-lbl">Personal Information</div>
+        <div class="fr">
+          <div class="fg"><label class="fl">First Name *</label><input class="fc" id="a-fn" placeholder="First name"></div>
+          <div class="fg"><label class="fl">Last Name *</label><input class="fc" id="a-ln" placeholder="Last name"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Date of Birth</label><input type="date" class="fc" id="a-dob"></div>
+          <div class="fg"><label class="fl">Gender</label>
+            <select class="fc" id="a-gen"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Email *</label><input type="email" class="fc" id="a-email" placeholder="student@school.edu"></div>
+          <div class="fg"><label class="fl">Phone</label><input class="fc" id="a-phone" placeholder="+92 300 0000000"></div>
+        </div>
+        <div class="sec-lbl">Parent / Guardian</div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Parent Name</label><input class="fc" id="a-par" placeholder="Guardian name"></div>
+          <div class="fg"><label class="fl">Parent Phone</label><input class="fc" id="a-pph" placeholder="+92 300 0000000"></div>
+        </div>
+        <div class="sec-lbl">Academic Information</div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Semester *</label>
+            <select class="fc" id="a-Semester">
+            <option value="">Select Semester</option>
+          <option>1st Semester</option>
+          <option>2nd Semester</option>
+          <option>3rd Semester</option>
+          <option>4th Semester</option>
+          <option>5th Semester</option>
+          <option>6th Semester</option>
+          <option>7th Semester</option>
+          <option>8th Semester</option>  
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Section</label>
+            <select class="fc" id="a-sec"><option>Section A</option><option>Section B</option><option>Section C</option></select>
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Enrollment Date</label><input type="date" class="fc" id="a-enroll"></div>
+          <div class="fg"><label class="fl">Status</label>
+            <select class="fc" id="a-status"><option>Active</option><option>Inactive</option></select>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="fc" id="a-notes" rows="2" placeholder="Optional notes…"></textarea></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn btn-p" onclick="saveStudent()"><i class="fa fa-save"></i>Save Student</button>
+          <button class="btn btn-l" onclick="clearAdd()"><i class="fa fa-rotate-left"></i>Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="p-results" class="page">
+      <div class="ph">
+        <div><div class="pt">Results</div><div class="ps">Enter and manage student results</div></div>
+        <button class="btn btn-p" onclick="openAddResult()"><i class="fa fa-plus"></i>Add Result</button>
+        <button class="btn btn-s" onclick="downloadResultsExcel()">
+  <i class="fa fa-file-excel"></i>Download Results
+</button>
+      </div>
+      <div class="cards">
+        <div class="card blue"><div class="val" id="r-cnt">0</div><div class="lbl">Results Entered</div></div>
+        <div class="card green"><div class="val" id="r-avg">—</div><div class="lbl">Class Average</div></div>
+        <div class="card"><div class="val" id="r-high">—</div><div class="lbl">Highest Score</div></div>
+        <div class="card red"><div class="val" id="r-fail">0</div><div class="lbl">Failing (&lt;50%)</div></div>
+      </div>
+      <div class="tb">
+        <div class="si"><i class="fa fa-search"></i><input id="r-q" placeholder="Search name or subject…" oninput="renderResults()"></div>
+        <select class="fc" style="width:150px" id="r-sf" onchange="renderResults()">
+          <option value="">All Subjects</option>
+          <option>Web Technology</option><option>Assembly language</option><option>Visual Programming</option>
+          <option>AI</option><option>Programming Fundamentals</option><option>OOP</option><option>Computer Networks</option>
+        </select>
+      </div>
+      <div class="tbox">
+        <div class="tw"><table>
+          <thead><tr><th>Student</th><th>Subject</th><th>Marks</th><th>Total</th><th>Percentage</th><th>Grade</th><th>Term</th><th>Action</th></tr></thead>
+          <tbody id="r-body"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div id="p-attendance" class="page">
+      <div class="ph">
+        <div><div class="pt">Attendance</div><div class="ps">Mark and track attendance</div></div>
+        <button class="btn btn-p" onclick="openMarkAtt()"><i class="fa fa-plus"></i>Mark Attendance</button>
+        <button class="btn btn-s" onclick="downloadAttendanceExcel()">
+  <i class="fa fa-file-excel"></i>Download Attendance Sheet
+</button>
+      </div>
+      <div class="cards">
+        <div class="card green"><div class="val" id="at-p">0</div><div class="lbl">Present Today</div></div>
+        <div class="card red"><div class="val" id="at-a">0</div><div class="lbl">Absent Today</div></div>
+        <div class="card blue"><div class="val" id="at-rate">—</div><div class="lbl">Overall Rate</div></div>
+      </div>
+      <div class="tbox">
+        <div class="tw"><table>
+          <thead><tr><th>Date</th><th>Student</th><th>Status</th><th>Note</th><th>Action</th></tr></thead>
+          <tbody id="at-body"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- COURSES -->
+    <div id="p-courses" class="page">
+      <div class="ph">
+        <div><div class="pt">Courses</div><div class="ps">Manage all courses</div></div>
+        <button class="btn btn-p" onclick="openAddCourse()"><i class="fa fa-plus"></i>Add Course</button>
+        <button class="btn btn-s" onclick="downloadCoursesExcel()">
+  <i class="fa fa-file-excel"></i>Download Courses
+</button>
+      </div>
+      <div class="cards">
+        <div class="card blue"><div class="val" id="c-cnt">0</div><div class="lbl">Total Courses</div></div>
+        <div class="card green"><div class="val" id="c-act">0</div><div class="lbl">Active</div></div>
+        <div class="card"><div class="val" id="c-stu">0</div><div class="lbl">Total Enrolled</div></div>
+      </div>
+      <div class="tb">
+        <div class="si"><i class="fa fa-search"></i><input id="c-q" placeholder="Search course or teacher…" oninput="renderCourses()"></div>
+        <select class="fc" style="width:120px" id="c-gf" onchange="renderCourses()">
+          <option value="">All Semesters</option>
+          <option>1st Semester</option>
+          <option>2nd Semester</option>
+          <option>3rd Semester</option>
+          <option>4th Semester</option>
+          <option>5th Semester</option>
+          <option>6th Semester</option>
+          <option>7th Semester</option>
+          <option>8th Semester</option>
+        </select>
+      </div>
+      <div id="c-grid" class="cg"></div>
+    </div>
+
+    <!-- EXAMINATIONS -->
+    <div id="p-exams" class="page">
+      <div class="ph">
+        <div><div class="pt">Examinations</div><div class="ps">Schedule and manage exams</div></div>
+        <button class="btn btn-p" onclick="openAddExam()"><i class="fa fa-plus"></i>Schedule Exam</button>
+        <button class="btn btn-s" onclick="downloadExamsExcel()">
+  <i class="fa fa-file-excel"></i>Download Examinations
+</button>
+      </div>
+      <div class="cards">
+        <div class="card blue"><div class="val" id="ex-cnt">0</div><div class="lbl">Total Exams</div></div>
+        <div class="card"><div class="val" id="ex-up">0</div><div class="lbl">Upcoming</div></div>
+        <div class="card green"><div class="val" id="ex-done">0</div><div class="lbl">Completed</div></div>
+        <div class="card red"><div class="val" id="ex-td">0</div><div class="lbl">Today</div></div>
+      </div>
+      <div class="tb">
+        <div class="si"><i class="fa fa-search"></i><input id="ex-q" placeholder="Search exam or subject…" oninput="renderExams()"></div>
+        <select class="fc" style="width:130px" id="ex-sf" onchange="renderExams()">
+          <option value="">All Status</option><option>Upcoming</option><option>Today</option><option>Completed</option>
+        </select>
+      </div>
+      <div class="tbox">
+        <div class="tw"><table>
+          <thead><tr><th>Title</th><th>Subject</th><th>Date</th><th>Time</th><th>Duration</th><th>Room</th><th>Semester</th><th>Marks</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="ex-body"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  <!-- REPORTS -->
+<div id="p-reports" class="page">
+  <div class="ph">
+    <div><div class="pt">Reports</div><div class="ps">Generate and export data reports</div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card blue"><div class="val" id="rep-students">0</div><div class="lbl">Total Students</div></div>
+    <div class="card green"><div class="val" id="rep-avg">—</div><div class="lbl">Avg Attendance</div></div>
+    <div class="card"><div class="val" id="rep-gpa">—</div><div class="lbl">Avg GPA</div></div>
+    <div class="card red"><div class="val" id="rep-fail">0</div><div class="lbl">Failing Students</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px">
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-users" style="color:var(--p);margin-right:6px"></i>Student Summary Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">Full list of all students with their semester, GPA and status.</div>
+      <button class="btn btn-p" style="width:100%" onclick="downloadStudentsExcel()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-chart-bar" style="color:var(--p);margin-right:6px"></i>Results Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">All student results including marks, percentages and grades.</div>
+      <button class="btn btn-p" style="width:100%" onclick="downloadResultsExcel()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-calendar-check" style="color:var(--p);margin-right:6px"></i>Attendance Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">Full attendance log with dates, statuses and notes.</div>
+      <button class="btn btn-p" style="width:100%" onclick="downloadAttendanceExcel()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-book-open" style="color:var(--p);margin-right:6px"></i>Courses Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">All course details including teachers, rooms and enrollment.</div>
+      <button class="btn btn-p" style="width:100%" onclick="downloadCoursesExcel()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-file-alt" style="color:var(--p);margin-right:6px"></i>Examinations Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">All scheduled exams with dates, rooms and status.</div>
+      <button class="btn btn-p" style="width:100%" onclick="downloadExamsExcel()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-star" style="color:var(--p);margin-right:6px"></i>Top Performers Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">Students with GPA above 3.5 ranked by performance.</div>
+      <button class="btn btn-p" style="width:100%" onclick="downloadTopPerformers()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-triangle-exclamation" style="color:#e02424;margin-right:6px"></i>At-Risk Students Report</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">Students with GPA below 2.0 or attendance issues.</div>
+      <button class="btn btn-r" style="width:100%" onclick="downloadAtRisk()"><i class="fa fa-file-excel"></i>Download (.xlsx)</button>
+    </div>
+
+    <div class="tbox" style="padding:20px">
+      <div style="font-weight:700;font-size:.9rem;margin-bottom:6px"><i class="fa fa-print" style="color:var(--p);margin-right:6px"></i>Print Dashboard</div>
+      <div style="font-size:.78rem;color:var(--m);margin-bottom:14px">Print a summary of the current dashboard overview.</div>
+      <button class="btn btn-l" style="width:100%" onclick="window.print()"><i class="fa fa-print"></i>Print Page</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="p-settings" class="page">
+  <div class="ph">
+    <div><div class="pt">Settings</div><div class="ps">Customize your EduTrack experience</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+
+    <!-- Appearance -->
+    <div class="fbox">
+      <div class="sec-lbl" style="margin-top:0">Appearance</div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b)">
+        <div>
+          <div style="font-size:.85rem;font-weight:600">Dark Mode</div>
+          <div style="font-size:.75rem;color:var(--m)">Switch between light and dark theme</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="set-dark" onchange="applyDarkSetting(this.checked)">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <div style="padding:12px 0;border-bottom:1px solid var(--b)">
+        <div style="font-size:.85rem;font-weight:600;margin-bottom:8px">Accent Colour</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap" id="accent-btns">
+          <button class="btn btn-xs accent-btn" data-color="#d63384" style="background:#d63384;color:#fff;border:none" onclick="setAccent('#d63384','#ff4da6','#c2185b')">Pink</button>
+          <button class="btn btn-xs accent-btn" data-color="#2563eb" style="background:#2563eb;color:#fff;border:none" onclick="setAccent('#2563eb','#3b82f6','#1d4ed8')">Blue</button>
+          <button class="btn btn-xs accent-btn" data-color="#0e9f6e" style="background:#0e9f6e;color:#fff;border:none" onclick="setAccent('#0e9f6e','#10b981','#047857')">Green</button>
+          <button class="btn btn-xs accent-btn" data-color="#7c3aed" style="background:#7c3aed;color:#fff;border:none" onclick="setAccent('#7c3aed','#8b5cf6','#6d28d9')">Purple</button>
+          <button class="btn btn-xs accent-btn" data-color="#ea580c" style="background:#ea580c;color:#fff;border:none" onclick="setAccent('#ea580c','#f97316','#c2410c')">Orange</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <div>
+          <div style="font-size:.85rem;font-weight:600">Compact Tables</div>
+          <div style="font-size:.75rem;color:var(--m)">Reduce row padding in tables</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="set-compact" onchange="applyCompact(this.checked)">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- School Info -->
+    <div class="fbox">
+      <div class="sec-lbl" style="margin-top:0">School Information</div>
+      <div class="fg"><label class="fl">School Name</label><input class="fc" id="set-school" placeholder="e.g. Karachi Institute of Technology"></div>
+      <div class="fg"><label class="fl">Department</label><input class="fc" id="set-dept" placeholder="e.g. Computer Science"></div>
+      <div class="fg"><label class="fl">Academic Year</label><input class="fc" id="set-year" placeholder="e.g. 2025 – 2026"></div>
+      <div class="fg"><label class="fl">Admin Name</label><input class="fc" id="set-admin" placeholder="Your name"></div>
+      <button class="btn btn-p" onclick="saveSchoolInfo()"><i class="fa fa-save"></i>Save Info</button>
+    </div>
+
+    <!-- Notifications -->
+    <div class="fbox">
+      <div class="sec-lbl" style="margin-top:0">Notifications</div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b)">
+        <div>
+          <div style="font-size:.85rem;font-weight:600">Show Toast Alerts</div>
+          <div style="font-size:.75rem;color:var(--m)">Pop-up notifications for actions</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="set-toast" checked onchange="saveSetting('toasts',this.checked)">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b)">
+        <div>
+          <div style="font-size:.85rem;font-weight:600">Confirm Before Delete</div>
+          <div style="font-size:.75rem;color:var(--m)">Always show a confirmation dialog</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="set-confirm" checked onchange="saveSetting('confirmDelete',this.checked)">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <div>
+          <div style="font-size:.85rem;font-weight:600">Highlight Failing Students</div>
+          <div style="font-size:.75rem;color:var(--m)">Mark rows red when GPA &lt; 2.0</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="set-highlight" onchange="applyHighlight(this.checked)">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Data Management -->
+    <div class="fbox">
+      <div class="sec-lbl" style="margin-top:0">Data Management</div>
+      <div style="font-size:.8rem;color:var(--m);margin-bottom:14px">All data is stored in your browser's local storage.</div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-l" style="justify-content:flex-start" onclick="exportAllData()"><i class="fa fa-download"></i>Export All Data (JSON backup)</button>
+        <button class="btn btn-l" style="justify-content:flex-start" onclick="document.getElementById('import-file').click()"><i class="fa fa-upload"></i>Import Data (JSON restore)</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-r" style="justify-content:flex-start" onclick="clearAllData()"><i class="fa fa-trash"></i>Clear All Data</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+  </div>
+</div>
+
+<!-- VIEW STUDENT -->
+<div class="overlay" id="m-view">
+  <div class="mbox">
+    <div class="mh">Student Profile <button class="xbtn" onclick="cm('m-view')">✕</button></div>
+    <div class="mb" id="m-view-body"></div>
+  </div>
+</div>
+
+<!-- EDIT STUDENT -->
+<div class="overlay" id="m-edit">
+  <div class="mbox">
+    <div class="mh">Edit Student <button class="xbtn" onclick="cm('m-edit')">✕</button></div>
+    <div class="mb" id="m-edit-body"></div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-edit')">Cancel</button>
+      <button class="btn btn-p" onclick="updateStudent()"><i class="fa fa-save"></i>Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="overlay" id="m-del">
+  <div class="mbox sm">
+    <div class="mh">Confirm Delete <button class="xbtn" onclick="cm('m-del')">✕</button></div>
+    <div class="mb" style="text-align:center;padding:24px 20px">
+      <i class="fa fa-trash-can" style="font-size:2.4rem;color:#e02424;margin-bottom:12px;display:block"></i>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:8px">Delete Student?</div>
+      <div style="font-size:.82rem;color:var(--m)">This will permanently remove <b id="del-name"></b> along with all their results and attendance records.</div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-del')">Cancel</button>
+      <button class="btn btn-r" onclick="confirmDel()"><i class="fa fa-trash"></i>Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD RESULT -->
+<div class="overlay" id="m-result">
+  <div class="mbox sm">
+    <div class="mh">Add Result <button class="xbtn" onclick="cm('m-result')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">Student *</label>
+        <select class="fc" id="r-sid"><option value="">Select student</option></select>
+      </div>
+      <div class="fg"><label class="fl">Subject *</label>
+        <select class="fc" id="r-subj">
+          <option value="">Select subject</option>
+           <option>Web Technology</option><option>Assembly language</option><option>Visual Programming</option>
+          <option>AI</option><option>Programming Fundamentals</option><option>OOP</option><option>Computer Networks</option>
+        </select>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Marks Obtained *</label><input type="number" class="fc" id="r-marks" placeholder="e.g. 78" min="0"></div>
+        <div class="fg"><label class="fl">Total Marks *</label><input type="number" class="fc" id="r-tot" placeholder="e.g. 100" min="1"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Term</label>
+          <select class="fc" id="r-term"><option>Mid Term</option><option>Final Term</option><option>Quiz</option><option>Assignment</option></select>
+        </div>
+        <div class="fg"><label class="fl">Date</label><input type="date" class="fc" id="r-date"></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-result')">Cancel</button>
+      <button class="btn btn-s" onclick="saveResult()"><i class="fa fa-save"></i>Save Result</button>
+    </div>
+  </div>
+</div>
+
+<!-- MARK ATTENDANCE -->
+<div class="overlay" id="m-att">
+  <div class="mbox sm">
+    <div class="mh">Mark Attendance <button class="xbtn" onclick="cm('m-att')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">Student *</label>
+        <select class="fc" id="att-sid"><option value="">Select student</option></select>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Date *</label><input type="date" class="fc" id="att-date"></div>
+        <div class="fg"><label class="fl">Status *</label>
+          <select class="fc" id="att-st"><option>Present</option><option>Absent</option><option>Late</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Note</label><input class="fc" id="att-note" placeholder="Optional note"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-att')">Cancel</button>
+      <button class="btn btn-s" onclick="saveAtt()"><i class="fa fa-check"></i>Mark</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD COURSE -->
+<div class="overlay" id="m-course">
+  <div class="mbox">
+    <div class="mh"><span id="m-course-title">Add Course</span> <button class="xbtn" onclick="cm('m-course')">✕</button></div>
+    <div class="mb">
+      <div class="fr">
+        <div class="fg"><label class="fl">Course Name *</label><input class="fc" id="co-name" placeholder="e.g. AI"></div>
+        <div class="fg"><label class="fl">Course Code *</label><input class="fc" id="co-code" placeholder="e.g. CS-301"></div>
+      </div>
+      <div class="fg"><label class="fl">Teacher Name *</label><input class="fc" id="co-teacher" placeholder="Full name"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Semester</label>
+          <select class="fc" id="co-Semester">
+            <option value="">All Semesters</option>
+          <option>1st Semester</option>
+          <option>2nd Semester</option>
+          <option>3rd Semester</option>
+          <option>4th Semester</option>
+          <option>5th Semester</option>
+          <option>6th Semester</option>
+          <option>7th Semester</option>
+          <option>8th Semester</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Status</label>
+          <select class="fc" id="co-status"><option>Active</option><option>Inactive</option></select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Schedule / Days</label><input class="fc" id="co-schedule" placeholder="e.g. Mon / Wed / Fri"></div>
+        <div class="fg"><label class="fl">Time</label><input class="fc" id="co-time" placeholder="e.g. 09:00 – 10:00"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Room</label><input class="fc" id="co-room" placeholder="e.g. Room 101"></div>
+        <div class="fg"><label class="fl">Max Students</label><input type="number" class="fc" id="co-max" placeholder="e.g. 35" min="1"></div>
+      </div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fc" id="co-desc" rows="2" placeholder="Optional course description…"></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-course')">Cancel</button>
+      <button class="btn btn-p" onclick="saveCourse()"><i class="fa fa-save"></i>Save Course</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD EXAM -->
+<div class="overlay" id="m-exam">
+  <div class="mbox">
+    <div class="mh"><span id="m-exam-title">Schedule Exam</span> <button class="xbtn" onclick="cm('m-exam')">✕</button></div>
+    <div class="mb">
+      <div class="fr">
+        <div class="fg"><label class="fl">Exam Title *</label><input class="fc" id="ex-title" placeholder="e.g. Mid Term"></div>
+        <div class="fg"><label class="fl">Subject *</label>
+          <select class="fc" id="ex-subj">
+            <option value="">Select subject</option>
+             <option>Web Technology</option><option>Assembly language</option><option>Visual Programming</option>
+          <option>AI</option><option>Programming Fundamentals</option><option>OOP</option><option>Computer Networks</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Date *</label><input type="date" class="fc" id="ex-date"></div>
+        <div class="fg"><label class="fl">Start Time *</label><input type="time" class="fc" id="ex-time"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Duration</label><input class="fc" id="ex-dur" placeholder="e.g. 2 hours"></div>
+        <div class="fg"><label class="fl">Room / Hall</label><input class="fc" id="ex-room" placeholder="e.g. Hall A"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Semester</label>
+          <select class="fc" id="ex-Semester">
+            <option value="">All Semesters</option>
+          <option>1st Semester</option>
+          <option>2nd Semester</option>
+          <option>3rd Semester</option>
+          <option>4th Semester</option>
+          <option>5th Semester</option>
+          <option>6th Semester</option>
+          <option>7th Semester</option>
+          <option>8th Semester</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Total Marks</label><input type="number" class="fc" id="ex-marks" placeholder="e.g. 100" min="1"></div>
+      </div>
+      <div class="fg"><label class="fl">Instructions / Notes</label><textarea class="fc" id="ex-notes" rows="2" placeholder="Optional exam instructions…"></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-exam')">Cancel</button>
+      <button class="btn btn-p" onclick="saveExam()"><i class="fa fa-save"></i>Save Exam</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW EXAM -->
+<div class="overlay" id="m-exam-view">
+  <div class="mbox sm">
+    <div class="mh">Exam Details <button class="xbtn" onclick="cm('m-exam-view')">✕</button></div>
+    <div class="mb" id="m-exam-view-body"></div>
+  </div>
+</div>
+
+<!-- DELETE EXAM CONFIRM -->
+<div class="overlay" id="m-del-exam">
+  <div class="mbox sm">
+    <div class="mh">Delete Exam <button class="xbtn" onclick="cm('m-del-exam')">✕</button></div>
+    <div class="mb" style="text-align:center;padding:24px 20px">
+      <i class="fa fa-trash-can" style="font-size:2.4rem;color:#e02424;margin-bottom:12px;display:block"></i>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:8px">Delete this exam?</div>
+      <div style="font-size:.82rem;color:var(--m)">Remove <b id="del-exam-name"></b> permanently?</div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-del-exam')">Cancel</button>
+      <button class="btn btn-r" onclick="confirmDelExam()"><i class="fa fa-trash"></i>Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE COURSE CONFIRM -->
+<div class="overlay" id="m-del-course">
+  <div class="mbox sm">
+    <div class="mh">Delete Course <button class="xbtn" onclick="cm('m-del-course')">✕</button></div>
+    <div class="mb" style="text-align:center;padding:24px 20px">
+      <i class="fa fa-trash-can" style="font-size:2.4rem;color:#e02424;margin-bottom:12px;display:block"></i>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:8px">Delete this course?</div>
+      <div style="font-size:.82rem;color:var(--m)">Remove <b id="del-course-name"></b> permanently?</div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-l" onclick="cm('m-del-course')">Cancel</button>
+      <button class="btn btn-r" onclick="confirmDelCourse()"><i class="fa fa-trash"></i>Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let students = JSON.parse(localStorage.getItem('students')) || [];
+let results = JSON.parse(localStorage.getItem('results')) || [];
+let attendance = JSON.parse(localStorage.getItem('attendance')) || [];
+let courses = JSON.parse(localStorage.getItem('courses')) || [];
+let exams = JSON.parse(localStorage.getItem('exams')) || [];
+
+let delId=null, editId=null, sPage=1, delExamId=null, delCourseId=null, editCourseId=null, editExamId=null;
+const PER=8, today=new Date().toISOString().split('T')[0];
+let idCtr=1, courseIdCtr=1, examIdCtr=1;
+// ================= SAMPLE DATA =================
+
+// Students
+students = [
+{
+  id:'STU-001',
+  fn:'Banafsha',
+  ln:'Imran',
+  dob:'2008-04-12',
+  gender:'Female',
+  email:'banafsha@bzu.edu.pk',
+  phone:'+92 300 1111111',
+  parent:'Imran',
+  pPhone:'+92 300 9999999',
+  Semester:'4th semester',
+  section:'Section A',
+  enrollDate:'2024-08-15',
+  status:'Active',
+  notes:'Excellent in Computer Science',
+  gpa:3.87
+},
+{
+  id:'STU-002',
+  fn:'Hadia',
+  ln:'Noor',
+  dob:'2007-09-20',
+  gender:'Female',
+  email:'hadia@bzu.edu.pk',
+  phone:'+92 300 2222222',
+  parent:'Ahmed khan',
+  pPhone:'+92 300 8888888',
+  Semester:'4th semester',
+  section:'Section B',
+  enrollDate:'2024-02-10',
+  status:'Active',
+  notes:'Excellent in Computer Science',
+  gpa:3.80
+},
+
+{
+  id:'STU-003',
+  fn:'Aliya',
+  ln:'Abbas',
+  dob:'2007-11-05',
+  gender:'Female',
+  email:'aliya@bzu.edu.pk',
+  phone:'+92 300 3333333',
+  parent:'Abbas Khan',
+  pPhone:'+92 300 7777777',
+  Semester:'4th Semester',
+  section:'Section A',
+  enrollDate:'2024-08-15',
+  status:'Active',
+  notes:'Struggling with coursework, needs extra support',
+  gpa:1.45
+}
+];
+
+idCtr = 4;
+
+// Results
+results = [
+{
+  id:'R1',
+  sid:'STU-001',
+  subject:'Web Technology',
+  marks:28,
+  tot:30,
+  pct:93,
+  term:'Mid Term',
+  date:today
+},
+{
+  id:'R2',
+  sid:'STU-002',
+  subject:'Economics',
+  marks:26,
+  tot:30,
+  pct:86,
+  term:'Mid Term',
+  date:today
+},
+{
+  id:'R3',
+  sid:'STU-003',
+  subject:'Web Technology',
+  marks:12,
+  tot:30,
+  pct:40,
+  term:'Mid Term',
+  date:today
+},
+{
+  id:'R4',
+  sid:'STU-003',
+  subject:'OOP',
+  marks:18,
+  tot:50,
+  pct:36,
+  term:'Mid Term',
+  date:today
+}
+];
+
+// Attendance
+attendance = [
+{
+  id:'AT1',
+  sid:'STU-001',
+  date:today,
+  status:'Present',
+  note:'On time'
+},
+{
+  id:'AT2',
+  sid:'STU-002',
+  date:today,
+  status:'Absent',
+  note:'Sick leave'
+}
+,{
+  id:'AT3',
+  sid:'STU-003',
+  date:today,
+  status:'Absent',
+  note:'Unexcused absence'
+}
+];
+
+// Courses
+courses = [
+{
+  id:'COURSE-1',
+  name:'Web Technology',
+  code:'CS-101',
+  teacher:'Sir Muzaffar',
+  Semester:'4th semester',
+  status:'Active',
+  schedule:'Wed / Thurs',
+  time:'11:30 - 12:30',
+  room:'Sun Lab',
+  max:35,
+  desc:'Web Technology Theory Class',
+  enrolled:28
+},
+{
+  id:'COURSE-2',
+  name:'Web Technology Lab',
+  code:'CS-201',
+  teacher:'Sir Zabihuddin',
+  Semester:'4th semester',
+  status:'Active',
+  schedule:'Wed',
+  time:'01:00 - 04:00',
+  room:'CRDC Lab',
+  max:30,
+  desc:'Web Technology Lab Class',
+  enrolled:24
+}
+];
+
+courseIdCtr = 3;
+
+// Exams
+exams = [
+{
+  id:'EXAM-1',
+  title:'Mid Term',
+  subject:'Web Technology',
+  date:today,
+  time:'09:00',
+  duration:'1.5 Hours',
+  room:'Exam Hall',
+  Semester:'4th semester',
+  marks:'30',
+  notes:'No cheating',
+  status:'Today'
+},
+{
+  id:'EXAM-2',
+  title:'Final',
+  subject:'Web Technology',
+  date:'2026-06-6',
+  time:'11:00',
+  duration:'2 Hours',
+  room:'Exam hall',
+  Semester:'4th semester',
+  marks:'50',
+  notes:'Theory + Lab',
+  status:'Upcoming'
+}
+];
+
+examIdCtr = 3;
+function saveAllData(){
+  localStorage.setItem('students', JSON.stringify(students));
+  localStorage.setItem('results', JSON.stringify(results));
+  localStorage.setItem('attendance', JSON.stringify(attendance));
+  localStorage.setItem('courses', JSON.stringify(courses));
+  localStorage.setItem('exams', JSON.stringify(exams));
+}
+// Navigation
+function go(p){
+  ['dashboard','students','add','results','attendance','courses','exams','reports','settings'].forEach(x=>{
+    document.getElementById('p-'+x).classList.remove('on');
+    document.querySelectorAll('.nav-a').forEach(n=>{if(n.getAttribute('onclick')==="go('"+x+"')")n.classList.remove('on');});
+  });
+  document.getElementById('p-'+p).classList.add('on');
+  document.querySelectorAll('.nav-a').forEach(n=>{if(n.getAttribute('onclick')==="go('"+p+"')")n.classList.add('on');});
+  document.getElementById('bc-cur').textContent={dashboard:'Dashboard',students:'Students',add:'Add Student',results:'Results',attendance:'Attendance',courses:'Courses',exams:'Examinations',reports:'Reports', settings:'Settings'}[p]||p;
+  if(p==='dashboard')initDash();
+  if(p==='students')renderStudents();
+  if(p==='results'){renderResults();updateRStats();}
+  if(p==='attendance')renderAtt();
+  if(p==='courses'){renderCourses();updateCStats();}
+  if(p==='exams'){renderExams();updateExStats();}
+  if(p==='reports'){initReports();}
+  if(p==='settings'){loadSettings();}
+}
+
+// Dashboard
+function initDash(){
+  document.getElementById('d-total').textContent=students.length;
+  document.getElementById('d-active').textContent=students.filter(s=>s.status==='Active').length;
+  document.getElementById('d-inactive').textContent=students.filter(s=>s.status==='Inactive').length;
+  const gpas=students.filter(s=>s.gpa!=null).map(s=>s.gpa);
+  document.getElementById('d-avggpa').textContent=gpas.length?(gpas.reduce((a,b)=>a+b,0)/gpas.length).toFixed(2):'—';
+  const tb=document.getElementById('d-recent');
+  const rec=[...students].reverse().slice(0,5);
+  tb.innerHTML=rec.length?rec.map(s=>`<tr><td><b>${s.fn} ${s.ln}</b></td><td style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--m)">${s.id}</td><td>${s.Semester}</td><td>${sb(s.status)}</td></tr>`).join('')
+    :`<tr><td colspan="4"><div class="empty"><i class="fa fa-user-graduate"></i>No students yet — <a href="#" onclick="go('add');return false">Add one →</a></div></td></tr>`;
+}
+
+// Students list
+function renderStudents(){
+  const q=(document.getElementById('s-q').value||'').toLowerCase();
+  const gr=document.getElementById('s-gr').value;
+  const st=document.getElementById('s-st').value;
+  let list=students.filter(s=>{
+    return(!q||`${s.fn} ${s.ln} ${s.id} ${s.email}`.toLowerCase().includes(q))&&(!gr||s.Semester===gr)&&(!st||s.status===st);
+  });
+  const tot=list.length, tp=Math.ceil(tot/PER)||1;
+  if(sPage>tp)sPage=1;
+  const sl=list.slice((sPage-1)*PER,sPage*PER);
+  const hlFail=localStorage.getItem('highlightFailing')==='true';
+  document.getElementById('s-body').innerHTML=sl.length?sl.map(s=>`<tr style="${hlFail&&s.gpa!=null&&s.gpa<2.0?'background:#fde8e8;':''}">
+    <td><b>${s.fn} ${s.ln}</b><div style="font-size:.72rem;color:var(--m)">${s.gender||''}</div></td>
+    <td style="font-family:'DM Mono',monospace;font-size:.78rem">${s.id}</td>
+    <td style="font-size:.8rem;color:var(--m)">${s.email}</td>
+    <td>${s.Semester}</td>
+    <td style="font-family:'DM Mono',monospace">${s.gpa!=null?s.gpa:'—'}</td>
+    <td>${sb(s.status)}</td>
+    <td><div style="display:flex;gap:5px">
+      <button class="btn btn-l btn-xs" onclick="viewStudent('${s.id}')"><i class="fa fa-eye"></i></button>
+      <button class="btn btn-l btn-xs" onclick="editStudent('${s.id}')"><i class="fa fa-pen"></i></button>
+      <button class="btn btn-r btn-xs" onclick="askDel('${s.id}')"><i class="fa fa-trash"></i></button>
+    </div></td>
+  </tr>`).join(''):`<tr><td colspan="7"><div class="empty"><i class="fa fa-magnifying-glass"></i>${students.length?'No matches found.':'No students yet.'}</div></td></tr>`;
+  document.getElementById('s-info').textContent=tot?`Showing ${(sPage-1)*PER+1}–${Math.min(sPage*PER,tot)} of ${tot}`:'';
+  const pb=document.getElementById('s-pages');pb.innerHTML='';
+  for(let i=1;i<=tp;i++){const b=document.createElement('button');b.className='btn btn-xs '+(i===sPage?'btn-p':'btn-l');b.textContent=i;b.onclick=()=>{sPage=i;renderStudents();};pb.appendChild(b);}
+}
+
+// Add student
+function saveStudent(){
+  const fn=v('a-fn'),ln=v('a-ln'),email=v('a-email'),Semester=v('a-Semester');
+  if(!fn||!ln||!email||!Semester){toast('Please fill required fields (*)','err');return;}
+  const id='STU-'+String(idCtr++).padStart(3,'0');
+  students.push({id,fn,ln,dob:v('a-dob'),gender:v('a-gen'),email,phone:v('a-phone'),parent:v('a-par'),pPhone:v('a-pph'),Semester,section:v('a-sec'),enrollDate:v('a-enroll'),status:v('a-status')||'Active',notes:v('a-notes'),gpa:null});
+  saveAllData();
+  toast(`${fn} ${ln} added successfully!`);
+  clearAdd();fillDropdowns();go('students');
+}
+function clearAdd(){['a-fn','a-ln','a-dob','a-gen','a-email','a-phone','a-par','a-pph','a-enroll','a-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.getElementById('a-Semester').value='';document.getElementById('a-status').value='Active';}
+
+// View student
+function viewStudent(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  const rs=results.filter(r=>r.sid===id);
+  const gpa=calcGpa(id);
+  document.getElementById('m-view-body').innerHTML=`
+    <div style="background:linear-gradient(135deg,var(--d),#1f2937);color:#fff;padding:18px;border-radius:10px;margin-bottom:18px;display:flex;gap:14px;align-items:center">
+      <div style="width:50px;height:50px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;flex-shrink:0">${s.fn[0]}${s.ln[0]}</div>
+      <div><div style="font-size:1.05rem;font-weight:700">${s.fn} ${s.ln}</div>
+      <div style="font-size:.78rem;opacity:.6;font-family:'DM Mono',monospace">${s.id}</div>
+      <div style="margin-top:6px">${sb(s.status)}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${fi('Semester',s.Semester)}${fi('Section',s.section)}
+      ${fi('Email',s.email)}${fi('Phone',s.phone||'—')}
+      ${fi('Date of Birth',s.dob||'—')}${fi('Gender',s.gender||'—')}
+      ${fi('Parent',s.parent||'—')}${fi('Parent Phone',s.pPhone||'—')}
+      ${fi('Enrolled',s.enrollDate||'—')}${fi('GPA',gpa!=null?gpa:'—')}
+    </div>
+    ${rs.length?`<div style="margin-top:18px"><div style="font-weight:700;margin-bottom:10px;font-size:.85rem">Results (${rs.length} entries)</div>
+    ${rs.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b)">
+      <span style="font-weight:600;font-size:.84rem">${r.subject}</span>
+      <span style="font-size:.78rem;color:var(--m)">${r.term}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="pbar"><div class="pfill" style="width:${r.pct}%;background:${r.pct>=50?'var(--s)':'#e02424'}"></div></div>
+        <span style="font-family:'DM Mono',monospace;font-size:.78rem">${r.marks}/${r.tot} (${r.pct}%)</span>${gb(r.pct)}
+      </div>
+    </div>`).join('')}</div>`:''}
+    ${s.notes?`<div style="margin-top:14px;padding:10px;background:var(--bg);border-radius:7px;font-size:.8rem;color:var(--m)"><b>Notes:</b> ${s.notes}</div>`:''}
+  `;
+  om('m-view');
+}
+
+// Edit student
+function editStudent(id){
+  const s=students.find(x=>x.id===id);if(!s)return;editId=id;
+  document.getElementById('m-edit-body').innerHTML=`
+    <div class="fr"><div class="fg"><label class="fl">First Name</label><input class="fc" id="e-fn" value="${s.fn}"></div>
+    <div class="fg"><label class="fl">Last Name</label><input class="fc" id="e-ln" value="${s.ln}"></div></div>
+    <div class="fg"><label class="fl">Email</label><input type="email" class="fc" id="e-em" value="${s.email}"></div>
+    <div class="fg"><label class="fl">Phone</label><input class="fc" id="e-ph" value="${s.phone||''}"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Semester</label><select class="fc" id="e-gr">${['1st Semester','2nd Semester','3rd Semester','4th Semester','5th Semester','6th Semester','7th Semester','8th Semester'].map(g=>`<option ${g===s.Semester?'selected':''}>${g}</option>`).join('')}</select></div>
+      <div class="fg"><label class="fl">Section</label><select class="fc" id="e-sec">${['Section A','Section B','Section C'].map(sec=>`<option ${sec===s.section?'selected':''}>${sec}</option>`).join('')}</select></div>
+    </div>
+    <div class="fg"><label class="fl">Status</label><select class="fc" id="e-st">${['Active','Inactive'].map(st=>`<option ${st===s.status?'selected':''}>${st}</option>`).join('')}</select></div>
+    <div class="fg"><label class="fl">Notes</label><textarea class="fc" id="e-notes" rows="2">${s.notes||''}</textarea></div>`;
+  om('m-edit');
+}
+function updateStudent(){
+  const s=students.find(x=>x.id===editId);if(!s)return;
+  s.fn=v('e-fn');s.ln=v('e-ln');s.email=v('e-em');s.phone=v('e-ph');
+  s.Semester=v('e-gr');s.section=v('e-sec');s.status=v('e-st');s.notes=v('e-notes');
+  saveAllData();
+  cm('m-edit');renderStudents();fillDropdowns();toast('Student updated!');
+}
+
+// Delete student
+function askDel(id){const s=students.find(x=>x.id===id);if(!s)return;delId=id;document.getElementById('del-name').textContent=`${s.fn} ${s.ln}`;om('m-del');}
+function confirmDel(){
+  students=students.filter(s=>s.id!==delId);
+  results=results.filter(r=>r.sid!==delId);
+  attendance=attendance.filter(a=>a.sid!==delId);
+  cm('m-del');renderStudents();fillDropdowns();initDash();
+  saveAllData();
+  toast('Student and all records deleted.','err');
+}
+
+// Results
+function openAddResult(){if(!students.length){toast('Add a student first.','err');return;}document.getElementById('r-date').value=today;document.getElementById('r-marks').value='';document.getElementById('r-tot').value='';document.getElementById('r-subj').value='';om('m-result');}
+function saveResult(){
+  const sid=v('r-sid'),subj=v('r-subj'),marks=parseFloat(v('r-marks')),tot=parseFloat(v('r-tot'));
+  if(!sid||!subj||isNaN(marks)||isNaN(tot)||tot<=0){toast('Fill all required fields.','err');return;}
+  if(marks>tot){toast('Marks cannot exceed total marks.','err');return;}
+  const pct=Math.round(marks/tot*100);
+  results.push({id:'R'+Date.now(),sid,subject:subj,marks,tot,pct,term:v('r-term'),date:v('r-date')||today});
+  recalcGpa(sid);cm('m-result');renderResults();updateRStats();
+  saveAllData();
+  toast('Result saved!');
+}
+function renderResults(){
+  const q=(document.getElementById('r-q').value||'').toLowerCase();
+  const sf=document.getElementById('r-sf').value;
+  let list=results.filter(r=>{
+    const s=students.find(x=>x.id===r.sid);
+    const nm=s?`${s.fn} ${s.ln}`.toLowerCase():'';
+    return(!q||nm.includes(q)||r.subject.toLowerCase().includes(q))&&(!sf||r.subject===sf);
+  });
+  document.getElementById('r-body').innerHTML=list.length?list.map(r=>{
+    const s=students.find(x=>x.id===r.sid);
+    return `<tr>
+      <td><b>${s?s.fn+' '+s.ln:'Unknown'}</b><div style="font-size:.72rem;color:var(--m)">${r.sid}</div></td>
+      <td>${r.subject}</td>
+      <td style="font-family:'DM Mono',monospace">${r.marks}</td>
+      <td style="font-family:'DM Mono',monospace">${r.tot}</td>
+      <td><div style="display:flex;align-items:center;gap:6px">
+        <div class="pbar"><div class="pfill" style="width:${r.pct}%;background:${r.pct>=50?'var(--s)':'#e02424'}"></div></div>
+        <span style="font-family:'DM Mono',monospace;font-size:.8rem">${r.pct}%</span>
+      </div></td>
+      <td>${gb(r.pct)}</td>
+      <td><span class="badge b-b">${r.term}</span></td>
+      <td><button class="btn btn-r btn-xs" onclick="delResult('${r.id}')"><i class="fa fa-trash"></i></button></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="8"><div class="empty"><i class="fa fa-chart-bar"></i>${results.length?'No matches.':'No results yet. Click + Add Result.'}</div></td></tr>`;
+}
+function updateRStats(){
+  document.getElementById('r-cnt').textContent=results.length;
+  if(!results.length){document.getElementById('r-avg').textContent='—';document.getElementById('r-high').textContent='—';document.getElementById('r-fail').textContent=0;return;}
+  document.getElementById('r-avg').textContent=Math.round(results.reduce((a,r)=>a+r.pct,0)/results.length)+'%';
+  document.getElementById('r-high').textContent=Math.max(...results.map(r=>r.pct))+'%';
+  document.getElementById('r-fail').textContent=results.filter(r=>r.pct<50).length;
+}
+function delResult(id){const r=results.find(x=>x.id===id);if(!r)return;results=results.filter(x=>x.id!==id);recalcGpa(r.sid);renderResults();updateRStats();
+saveAllData();
+toast('Result deleted.');}
+function recalcGpa(sid){const rs=results.filter(r=>r.sid===sid);const s=students.find(x=>x.id===sid);if(!s)return;s.gpa=rs.length?+(rs.reduce((a,r)=>a+r.pct,0)/rs.length/25).toFixed(2):null;}
+function calcGpa(sid){const rs=results.filter(r=>r.sid===sid);return rs.length?+(rs.reduce((a,r)=>a+r.pct,0)/rs.length/25).toFixed(2):null;}
+
+// Attendance
+function openMarkAtt(){if(!students.length){toast('Add a student first.','err');return;}document.getElementById('att-date').value=today;document.getElementById('att-note').value='';om('m-att');}
+function saveAtt(){
+  const sid=v('att-sid'),date=v('att-date'),status=v('att-st');
+  if(!sid||!date){toast('Select student and date.','err');return;}
+  attendance.push({id:'AT'+Date.now(),sid,date,status,note:v('att-note')});
+  cm('m-att');renderAtt();
+  saveAllData();
+  toast('Attendance marked!');
+}
+function renderAtt(){
+  const td=attendance.filter(a=>a.date===today);
+  document.getElementById('at-p').textContent=td.filter(a=>a.status==='Present').length;
+  document.getElementById('at-a').textContent=td.filter(a=>a.status==='Absent').length;
+  const t=attendance.length,p=attendance.filter(a=>a.status==='Present').length;
+  document.getElementById('at-rate').textContent=t?Math.round(p/t*100)+'%':'—';
+  const sorted=[...attendance].sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('at-body').innerHTML=sorted.length?sorted.map(a=>{
+    const s=students.find(x=>x.id===a.sid);
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:.8rem">${a.date}</td>
+      <td><b>${s?s.fn+' '+s.ln:'Unknown'}</b></td>
+      <td>${a.status==='Present'?'<span class="badge b-g">Present</span>':a.status==='Absent'?'<span class="badge b-r">Absent</span>':'<span class="badge b-y">Late</span>'}</td>
+      <td style="font-size:.8rem;color:var(--m)">${a.note||'—'}</td>
+      <td><button class="btn btn-r btn-xs" onclick="delAtt('${a.id}')"><i class="fa fa-trash"></i></button></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="5"><div class="empty"><i class="fa fa-calendar"></i>No attendance records yet.</div></td></tr>`;
+}
+function delAtt(id){attendance=attendance.filter(a=>a.id!==id);renderAtt();
+saveAllData();
+toast('Record deleted.');}
+
+// Helpers
+function v(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function om(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
+function cm(id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}
+function sb(st){return st==='Active'?'<span class="badge b-g">Active</span>':'<span class="badge b-r">'+st+'</span>';}
+function gb(pct){if(pct>=90)return'<span class="badge b-g">A+</span>';if(pct>=80)return'<span class="badge b-g">A</span>';if(pct>=70)return'<span class="badge b-b">B</span>';if(pct>=60)return'<span class="badge b-y">C</span>';if(pct>=50)return'<span class="badge b-y">D</span>';return'<span class="badge b-r">F</span>';}
+function fi(l,val){return`<div style="background:var(--bg);padding:8px 12px;border-radius:7px"><div style="font-size:.68rem;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">${l}</div><div style="font-size:.84rem;font-weight:600">${val}</div></div>`;}
+function toast(msg,type){const d=document.createElement('div');d.className='ti'+(type==='err'?' err':'');d.innerHTML=`<i class="fa ${type==='err'?'fa-circle-xmark':'fa-circle-check'}"></i>${msg}`;document.getElementById('toast').appendChild(d);setTimeout(()=>{d.style.opacity='0';d.style.transform='translateX(60px)';d.style.transition='.3s';setTimeout(()=>d.remove(),300);},3000);}
+function fillDropdowns(){const opts=students.map(s=>`<option value="${s.id}">${s.fn} ${s.ln} (${s.id})</option>`).join('');document.getElementById('r-sid').innerHTML='<option value="">Select student</option>'+opts;document.getElementById('att-sid').innerHTML='<option value="">Select student</option>'+opts;}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)cm(o.id);}));
+// ================= COURSES =================
+
+function openAddCourse(){
+  editCourseId=null;
+  document.getElementById('m-course-title').textContent='Add Course';
+
+  ['co-name','co-code','co-teacher','co-schedule',
+   'co-time','co-room','co-max','co-desc']
+   .forEach(id=>document.getElementById(id).value='');
+
+  document.getElementById('co-Semester').value='All Semesters';
+  document.getElementById('co-status').value='Active';
+
+  om('m-course');
+}
+
+function saveCourse(){
+  const name=v('co-name');
+  const code=v('co-code');
+  const teacher=v('co-teacher');
+
+  if(!name || !code || !teacher){
+    toast('Please fill all required fields.','err');
+    return;
+  }
+
+  if(editCourseId){
+    const c=courses.find(x=>x.id===editCourseId);
+
+    c.name=name;
+    c.code=code;
+    c.teacher=teacher;
+    c.Semester=v('co-Semester');
+    c.status=v('co-status');
+    c.schedule=v('co-schedule');
+    c.time=v('co-time');
+    c.room=v('co-room');
+    c.max=v('co-max');
+    c.desc=v('co-desc');
+
+    toast('Course updated!');
+  }
+  else{
+    courses.push({
+      id:'COURSE-'+courseIdCtr++,
+      name,
+      code,
+      teacher,
+      Semester:v('co-Semester'),
+      status:v('co-status'),
+      schedule:v('co-schedule'),
+      time:v('co-time'),
+      room:v('co-room'),
+      max:v('co-max'),
+      desc:v('co-desc'),
+      enrolled:Math.floor(Math.random()*40)
+    });
+
+    toast('Course added!');
+  }
+  saveAllData();
+  cm('m-course');
+  renderCourses();
+  updateCStats();
+}
+
+function renderCourses(){
+  const q=(document.getElementById('c-q').value||'').toLowerCase();
+  const gf=document.getElementById('c-gf').value;
+
+  let list=courses.filter(c=>{
+    return (
+      (!q || `${c.name} ${c.teacher} ${c.code}`.toLowerCase().includes(q))
+      &&
+      (!gf || c.Semester===gf || gf==='All Semesters')
+    );
+  });
+
+  const grid=document.getElementById('c-grid');
+
+  grid.innerHTML=list.length ? list.map(c=>`
+    <div class="cc">
+      <div class="cc-top" style="background:${c.status==='Active'?'#0e9f6e':'#e02424'}"></div>
+
+      <div class="cc-body">
+        <div class="cc-name">${c.name}</div>
+
+        <div class="cc-row">
+          <i class="fa fa-hashtag"></i>${c.code}
+        </div>
+
+        <div class="cc-row">
+          <i class="fa fa-user"></i>${c.teacher}
+        </div>
+
+        <div class="cc-row">
+          <i class="fa fa-graduation-cap"></i>${c.Semester}
+        </div>
+
+        <div class="cc-row">
+          <i class="fa fa-clock"></i>${c.schedule || '—'}
+        </div>
+
+        <div class="cc-row">
+          <i class="fa fa-users"></i>${c.enrolled} students
+        </div>
+
+        <div style="margin-top:10px">
+          ${c.status==='Active'
+            ? '<span class="badge b-g">Active</span>'
+            : '<span class="badge b-r">Inactive</span>'}
+        </div>
+      </div>
+
+      <div class="cc-foot">
+        <button class="btn btn-l btn-xs" onclick="editCourse('${c.id}')">
+          <i class="fa fa-pen"></i>
+        </button>
+
+        <button class="btn btn-r btn-xs" onclick="askDelCourse('${c.id}')">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('')
+  :
+  `<div class="empty">
+      <i class="fa fa-book"></i>
+      No courses available.
+   </div>`;
+}
+
+function updateCStats(){
+  document.getElementById('c-cnt').textContent=courses.length;
+  document.getElementById('c-act').textContent=
+    courses.filter(c=>c.status==='Active').length;
+
+  document.getElementById('c-stu').textContent=
+    courses.reduce((a,b)=>a+(b.enrolled||0),0);
+}
+
+function editCourse(id){
+  const c=courses.find(x=>x.id===id);
+  if(!c)return;
+
+  editCourseId=id;
+
+  document.getElementById('m-course-title').textContent='Edit Course';
+
+  document.getElementById('co-name').value=c.name;
+  document.getElementById('co-code').value=c.code;
+  document.getElementById('co-teacher').value=c.teacher;
+  document.getElementById('co-Semester').value=c.Semester;
+  document.getElementById('co-status').value=c.status;
+  document.getElementById('co-schedule').value=c.schedule;
+  document.getElementById('co-time').value=c.time;
+  document.getElementById('co-room').value=c.room;
+  document.getElementById('co-max').value=c.max;
+  document.getElementById('co-desc').value=c.desc;
+
+  om('m-course');
+}
+
+function askDelCourse(id){
+  const c=courses.find(x=>x.id===id);
+  if(!c)return;
+
+  delCourseId=id;
+
+  document.getElementById('del-course-name').textContent=c.name;
+
+  om('m-del-course');
+}
+
+function confirmDelCourse(){
+  courses=courses.filter(c=>c.id!==delCourseId);
+
+  cm('m-del-course');
+
+  renderCourses();
+  updateCStats();
+  saveAllData();
+  toast('Course deleted.','err');
+}
+
+
+// ================= EXAMS =================
+
+function openAddExam(){
+  editExamId=null;
+
+  document.getElementById('m-exam-title').textContent='Schedule Exam';
+
+  ['ex-title','ex-date','ex-time','ex-dur',
+   'ex-room','ex-marks','ex-notes']
+   .forEach(id=>document.getElementById(id).value='');
+
+  document.getElementById('ex-subj').value='';
+  document.getElementById('ex-Semester').value='All Semesters';
+
+  om('m-exam');
+}
+
+function saveExam(){
+  const title=v('ex-title');
+  const subject=v('ex-subj');
+  const date=v('ex-date');
+  const time=v('ex-time');
+
+  if(!title || !subject || !date || !time){
+    toast('Please fill all required fields.','err');
+    return;
+  }
+
+  let status='Upcoming';
+
+  if(date===today) status='Today';
+  if(date<today) status='Completed';
+
+  if(editExamId){
+    const e=exams.find(x=>x.id===editExamId);
+
+    e.title=title;
+    e.subject=subject;
+    e.date=date;
+    e.time=time;
+    e.duration=v('ex-dur');
+    e.room=v('ex-room');
+    e.Semester=v('ex-Semester');
+    e.marks=v('ex-marks');
+    e.notes=v('ex-notes');
+    e.status=status;
+
+    toast('Exam updated!');
+  }
+  else{
+    exams.push({
+      id:'EXAM-'+examIdCtr++,
+      title,
+      subject,
+      date,
+      time,
+      duration:v('ex-dur'),
+      room:v('ex-room'),
+      Semester:v('ex-Semester'),
+      marks:v('ex-marks'),
+      notes:v('ex-notes'),
+      status
+    });
+
+    toast('Exam scheduled!');
+  }
+  saveAllData();
+  cm('m-exam');
+
+  renderExams();
+  updateExStats();
+}
+
+function renderExams(){
+  const q=(document.getElementById('ex-q').value||'').toLowerCase();
+  const sf=document.getElementById('ex-sf').value;
+
+  let list=exams.filter(e=>{
+    return (
+      (!q || `${e.title} ${e.subject}`.toLowerCase().includes(q))
+      &&
+      (!sf || e.status===sf)
+    );
+  });
+
+  document.getElementById('ex-body').innerHTML=list.length ? list.map(e=>`
+    <tr>
+      <td><b>${e.title}</b></td>
+      <td>${e.subject}</td>
+      <td>${e.date}</td>
+      <td>${e.time}</td>
+      <td>${e.duration || '—'}</td>
+      <td>${e.room || '—'}</td>
+      <td>${e.Semester}</td>
+      <td>${e.marks || '—'}</td>
+      <td>
+        ${
+          e.status==='Upcoming'
+          ? '<span class="badge b-b">Upcoming</span>'
+          : e.status==='Today'
+          ? '<span class="badge b-y">Today</span>'
+          : '<span class="badge b-g">Completed</span>'
+        }
+      </td>
+
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-l btn-xs" onclick="viewExam('${e.id}')">
+            <i class="fa fa-eye"></i>
+          </button>
+
+          <button class="btn btn-l btn-xs" onclick="editExam('${e.id}')">
+            <i class="fa fa-pen"></i>
+          </button>
+
+          <button class="btn btn-r btn-xs" onclick="askDelExam('${e.id}')">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('')
+  :
+  `<tr>
+      <td colspan="10">
+        <div class="empty">
+          <i class="fa fa-file-alt"></i>
+          No examinations available.
+        </div>
+      </td>
+   </tr>`;
+}
+
+function updateExStats(){
+  document.getElementById('ex-cnt').textContent=exams.length;
+  document.getElementById('ex-up').textContent=
+    exams.filter(e=>e.status==='Upcoming').length;
+
+  document.getElementById('ex-done').textContent=
+    exams.filter(e=>e.status==='Completed').length;
+
+  document.getElementById('ex-td').textContent=
+    exams.filter(e=>e.status==='Today').length;
+}
+
+function viewExam(id){
+  const e=exams.find(x=>x.id===id);
+  if(!e)return;
+
+  document.getElementById('m-exam-view-body').innerHTML=`
+    ${fi('Title',e.title)}
+    ${fi('Subject',e.subject)}
+    ${fi('Date',e.date)}
+    ${fi('Time',e.time)}
+    ${fi('Duration',e.duration||'—')}
+    ${fi('Room',e.room||'—')}
+    ${fi('Semester',e.Semester)}
+    ${fi('Marks',e.marks||'—')}
+    ${fi('Status',e.status)}
+    ${fi('Notes',e.notes||'—')}
+  `;
+
+  om('m-exam-view');
+}
+
+function editExam(id){
+  const e=exams.find(x=>x.id===id);
+  if(!e)return;
+
+  editExamId=id;
+
+  document.getElementById('m-exam-title').textContent='Edit Exam';
+
+  document.getElementById('ex-title').value=e.title;
+  document.getElementById('ex-subj').value=e.subject;
+  document.getElementById('ex-date').value=e.date;
+  document.getElementById('ex-time').value=e.time;
+  document.getElementById('ex-dur').value=e.duration;
+  document.getElementById('ex-room').value=e.room;
+  document.getElementById('ex-Semester').value=e.Semester;
+  document.getElementById('ex-marks').value=e.marks;
+  document.getElementById('ex-notes').value=e.notes;
+
+  om('m-exam');
+}
+
+function askDelExam(id){
+  const e=exams.find(x=>x.id===id);
+  if(!e)return;
+
+  delExamId=id;
+
+  document.getElementById('del-exam-name').textContent=e.title;
+
+  om('m-del-exam');
+}
+
+function confirmDelExam(){
+  exams=exams.filter(e=>e.id!==delExamId);
+
+  cm('m-del-exam');
+
+  renderExams();
+  updateExStats();
+  saveAllData();
+  toast('Exam deleted.','err');
+}
+
+
+// ================= INIT =================
+// ================= THEME =================
+
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+
+  const dark=document.body.classList.contains('dark');
+
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+
+  updateThemeButton();
+}
+
+function updateThemeButton(){
+  const btn=document.getElementById('themeBtn');
+
+  if(document.body.classList.contains('dark')){
+    btn.innerHTML='<i class="fa fa-sun"></i> Light Mode';
+  }
+  else{
+    btn.innerHTML='<i class="fa fa-moon"></i> Dark Mode';
+  }
+}
+
+// Load saved theme
+if(localStorage.getItem('theme')==='dark'){
+  document.body.classList.add('dark');
+}
+
+setTimeout(updateThemeButton,100);
+fillDropdowns();
+initDash();
+renderCourses();
+renderExams();
+updateCStats();
+updateExStats();
+function downloadExcel(data, filename){
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Data");
+
+  XLSX.writeFile(wb, filename);
+}
+
+function downloadStudentsExcel(){
+  downloadExcel(students, 'Students.xlsx');
+}
+
+function downloadResultsExcel(){
+  downloadExcel(results, 'Results.xlsx');
+}
+
+function downloadAttendanceExcel(){
+  downloadExcel(attendance, 'Attendance.xlsx');
+}
+
+function downloadCoursesExcel(){
+  downloadExcel(courses, 'Courses.xlsx');
+}
+
+function downloadExamsExcel(){
+  downloadExcel(exams, 'Examinations.xlsx');
+}
+// ================= REPORTS =================
+function initReports(){
+  document.getElementById('rep-students').textContent=students.length;
+  const gpas=students.filter(s=>s.gpa!=null).map(s=>s.gpa);
+  document.getElementById('rep-gpa').textContent=gpas.length?(gpas.reduce((a,b)=>a+b,0)/gpas.length).toFixed(2):'—';
+  document.getElementById('rep-fail').textContent=students.filter(s=>s.gpa!=null&&s.gpa<2.0).length;
+  const t=attendance.length,p=attendance.filter(a=>a.status==='Present').length;
+  document.getElementById('rep-avg').textContent=t?Math.round(p/t*100)+'%':'—';
+}
+
+function downloadTopPerformers(){
+  const top=students.filter(s=>s.gpa!=null&&s.gpa>=3.5)
+    .sort((a,b)=>b.gpa-a.gpa)
+    .map(s=>({Name:s.fn+' '+s.ln,ID:s.id,Semester:s.Semester,GPA:s.gpa,Status:s.status}));
+  if(!top.length){toast('No top performers found (GPA ≥ 3.5).','err');return;}
+  downloadExcel(top,'Top_Performers.xlsx');
+}
+
+function downloadAtRisk(){
+  const risk=students.filter(s=>(s.gpa!=null&&s.gpa<2.0)||s.status==='Inactive')
+    .map(s=>({Name:s.fn+' '+s.ln,ID:s.id,Semester:s.Semester,GPA:s.gpa!=null?s.gpa:'No results yet',Status:s.status}));
+  if(!risk.length){toast('No at-risk students found.');return;}
+  downloadExcel(risk,'At_Risk_Students.xlsx');
+  toast('At-risk report downloaded!');
+}
+
+// ================= SETTINGS =================
+function loadSettings(){
+  const dark=localStorage.getItem('theme')==='dark';
+  document.getElementById('set-dark').checked=dark;
+
+  const compact=localStorage.getItem('compactTables')==='true';
+  document.getElementById('set-compact').checked=compact;
+  if(compact)document.body.classList.add('compact-tables');
+
+  const toasts=localStorage.getItem('toasts');
+  document.getElementById('set-toast').checked=toasts!=='false';
+
+  const confirmDel=localStorage.getItem('confirmDelete');
+  document.getElementById('set-confirm').checked=confirmDel!=='false';
+
+  const highlight=localStorage.getItem('highlightFailing')==='true';
+  document.getElementById('set-highlight').checked=highlight;
+
+  const school=localStorage.getItem('schoolName')||'';
+  const dept=localStorage.getItem('deptName')||'';
+  const year=localStorage.getItem('acadYear')||'';
+  const admin=localStorage.getItem('adminName')||'';
+  document.getElementById('set-school').value=school;
+  document.getElementById('set-dept').value=dept;
+  document.getElementById('set-year').value=year;
+  document.getElementById('set-admin').value=admin;
+
+  if(school) document.querySelector('.brand').innerHTML=school+'<span> Track</span>';
+
+  const accent=localStorage.getItem('accentColor');
+  const accentS=localStorage.getItem('accentSecondary');
+  const accentT=localStorage.getItem('accentTertiary');
+  if(accent) applyAccentVars(accent,accentS,accentT);
+}
+
+function applyDarkSetting(on){
+  if(on) document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+  localStorage.setItem('theme',on?'dark':'light');
+  updateThemeButton();
+}
+
+function setAccent(p,w,s){
+  applyAccentVars(p,w,s);
+  localStorage.setItem('accentColor',p);
+  localStorage.setItem('accentSecondary',w);
+  localStorage.setItem('accentTertiary',s);
+  toast('Accent colour updated!');
+}
+
+function applyAccentVars(p,w,s){
+  const r=document.documentElement;
+  r.style.setProperty('--p',p);
+  r.style.setProperty('--w',w);
+  r.style.setProperty('--s',s);
+  // Update gradient buttons which are hardcoded in CSS
+  const style=document.getElementById('accent-dynamic-style')||document.createElement('style');
+  style.id='accent-dynamic-style';
+  style.textContent=`
+    .btn-p{background:linear-gradient(135deg,${p},${w})!important}
+    .btn-p:hover{background:linear-gradient(135deg,${s},${p})!important}
+    .btn-s{background:linear-gradient(135deg,${s},${p})!important}
+    .btn-s:hover{background:linear-gradient(135deg,${s},${s})!important}
+    .nav-a.on{background:linear-gradient(135deg,${p},${w})!important}
+    .pfill{background:${p}!important}
+  `;
+  document.head.appendChild(style);
+}
+
+function applyCompact(on){
+  if(on) document.body.classList.add('compact-tables');
+  else document.body.classList.remove('compact-tables');
+  localStorage.setItem('compactTables',on);
+}
+
+function applyHighlight(on){
+  localStorage.setItem('highlightFailing',on);
+  renderStudents();
+  toast(on?'Failing students will be highlighted.':'Highlighting turned off.');
+}
+
+function saveSetting(key,val){
+  localStorage.setItem(key,val);
+  toast('Setting saved!');
+}
+
+function saveSchoolInfo(){
+  localStorage.setItem('schoolName',document.getElementById('set-school').value.trim());
+  localStorage.setItem('deptName',document.getElementById('set-dept').value.trim());
+  localStorage.setItem('acadYear',document.getElementById('set-year').value.trim());
+  localStorage.setItem('adminName',document.getElementById('set-admin').value.trim());
+  const name=document.getElementById('set-school').value.trim();
+  if(name) document.querySelector('.brand').innerHTML=name;
+  toast('School information saved!');
+}
+
+function exportAllData(){
+  const data=JSON.stringify({students,results,attendance,courses,exams},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='EduTrack_Backup_'+today+'.json';
+  a.click();
+  toast('Backup downloaded!');
+}
+
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.students)students=d.students;
+      if(d.results)results=d.results;
+      if(d.attendance)attendance=d.attendance;
+      if(d.courses)courses=d.courses;
+      if(d.exams)exams=d.exams;
+      saveAllData();fillDropdowns();initDash();
+      toast('Data imported successfully!');
+    }catch(err){toast('Invalid backup file.','err');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function clearAllData(){
+  if(!confirm('Are you sure? This will permanently delete ALL students, results, attendance, courses and exams.'))return;
+  students=[];results=[];attendance=[];courses=[];exams=[];
+  saveAllData();fillDropdowns();initDash();
+  toast('All data cleared.','err');
+}
+</script>
+<script>
+  const MIN_LOAD_TIME = 2500; // 2.5 seconds (you can change this)
+
+  const start = Date.now();
+
+  window.addEventListener("load", function () {
+    const elapsed = Date.now() - start;
+    const remaining = MIN_LOAD_TIME - elapsed;
+
+    setTimeout(() => {
+      document.getElementById("loader").style.display = "none";
+    }, remaining > 0 ? remaining : 0);
+  });
+</script>
+</body>
+</html>
